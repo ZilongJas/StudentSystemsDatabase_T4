@@ -2,7 +2,9 @@
 
 1. Python3
 `https://www.python.org/downloads/`
-2. Flask
+2. Pip
+`https://bootstrap.pypa.io/get-pip.py`
+3. Flask
 `pip install Flask`
-3. Depedency Manager 
+4. Depedency Manager 
 ` pip install --user pipenv`
