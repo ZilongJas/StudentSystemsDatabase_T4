@@ -92,7 +92,6 @@ JOIN AcademicProgram ap
     ON s.MajorProgramCode = ap.MajorProgramCode;"""
     elif selection == "Report8":
          query = """SELECT
-    e.EnrollmentID,
     um.FirstName || ' ' || um.LastName AS StudentName,
     c.CourseID,
     c.Title                            AS CourseTitle,
@@ -285,3 +284,4 @@ ORDER BY sec.SectionID, sgi.ItemNo;"""
 
 if __name__ == "__main__":
     app.run(debug=True)
+
