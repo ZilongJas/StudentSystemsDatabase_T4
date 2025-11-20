@@ -6,3 +6,5 @@
 `pip install Flask`
 3. Depedency Manager 
 ` pip install --user pipenv`
+4. run python file
+5. open browser and enter localhost:5000
