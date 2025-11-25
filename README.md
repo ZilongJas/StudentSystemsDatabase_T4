@@ -4,8 +4,9 @@
 ![LandingPage](/Screenshots/image1.png)
 ![ReportExample](/Screenshots/image2.png)
 
-1. run python file
-2. open browser and enter localhost:5000
+1. download the entire package and unzip
+2. make sure you have installed the requirements and run the python file
+3. open browser and enter localhost:5000
 ___
 ## Run the requirementsCHECKER.bat file if not sure what requirements you are missing (works only on windows)
 WINDOWS:
