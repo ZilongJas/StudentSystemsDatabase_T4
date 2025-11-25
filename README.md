@@ -1,4 +1,4 @@
-## This is a student database created in SQLiteStudio and Lucidchart with ERD and logical diagram created from scratch by me and my team @SDSU.
+## This is a student database created from scratch in SQLiteStudio and Lucidchart with ERD and logical diagram by me and my team @SDSU.
 ![ERD](/Screenshots/ERD_Diagram.png)
 ![Logical](/Screenshots/Logical_Diagram.png)
 ![LandingPage](/Screenshots/image1.png)
