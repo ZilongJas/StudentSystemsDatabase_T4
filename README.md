@@ -15,9 +15,7 @@ WINDOWS:
 ` pip install --user pipenv`
 ___
 MAC OS:
-open terminal
-```
-python3 -m pip install --upgrade pip
-python3 -m pip install Flask
-pip install --user pipenv
-```
+open terminal and run the following commands
+`python3 -m pip install --upgrade pip`
+`python3 -m pip install Flask`
+`pip install --user pipenv`
