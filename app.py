@@ -16,15 +16,15 @@ def result():
 
     if selection == "Report1":
         query = """
-            SELECT
-                ap.MajorProgramCode AS MajorCode,
-                ap.ProgramName      AS MajorName,
-                COUNT(s.StudentID)  AS StudentCount
-            FROM AcademicProgram ap
-            JOIN Student s
-                ON s.MajorProgramCode = ap.MajorProgramCode
-            GROUP BY ap.MajorProgramCode, ap.ProgramName
-            ORDER BY StudentCount DESC;
+SELECT
+    ap.MajorProgramCode AS MajorCode,
+    ap.ProgramName      AS MajorName,
+    COUNT(s.StudentID)  AS StudentCount
+FROM AcademicProgram ap
+JOIN Student s
+    ON s.MajorProgramCode = ap.MajorProgramCode
+GROUP BY ap.MajorProgramCode, ap.ProgramName
+ORDER BY StudentCount DESC;
         """
     elif selection == "Report2":
         query = """SELECT
@@ -36,44 +36,41 @@ HAVING AVG(CumulativeGPA) >= 3.0
 ORDER BY AvgGPA DESC;"""
     elif selection == "Report3":
         query = """SELECT
-    um.MemberID,
     um.FirstName,
-    um.LastName,
-    s.StudentID
+    um.LastName
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
-WHERE um.LastName LIKE 'C%';"""
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
+WHERE um.LastName LIKE 'C%';
+"""
     elif selection == "Report4":
         query = """SELECT
-    s.StudentID,
     um.FirstName,
     um.LastName,
     s.CumulativeGPA
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 WHERE s.CumulativeGPA BETWEEN 2.50 AND 3.50
 ORDER BY s.CumulativeGPA DESC;"""
     elif selection == "Report5":
         query = """SELECT
-    s.StudentID,
     um.FirstName,
     um.LastName,
     s.MajorProgramCode
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 WHERE s.MajorProgramCode IN ('MIS', 'CS', 'FIN')
-ORDER BY s.MajorProgramCode, um.LastName, um.FirstName;"""
+ORDER BY s.MajorProgramCode, um.LastName, um.FirstName;
+"""
     elif selection == "Report6":
         query = """SELECT
-    s.StudentID,
     um.FirstName,
     um.LastName
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 WHERE s.StudentID NOT IN (
     SELECT sh.StudentID
     FROM StudentHold sh
@@ -82,14 +79,18 @@ WHERE s.StudentID NOT IN (
 ORDER BY s.StudentID;"""
     elif selection == "Report7":
         query = """SELECT
-    s.StudentID,
     um.FirstName || ' ' || um.LastName AS StudentName,
-    ap.ProgramName                      AS MajorName
+    ap.ProgramName                      AS MajorName,
+    p.PhoneNumber                       AS PrimaryPhone,
+    p.PhoneType
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 JOIN AcademicProgram ap
-    ON s.MajorProgramCode = ap.MajorProgramCode;"""
+    ON s.MajorProgramCode = ap.MajorProgramCode
+LEFT JOIN UniversityMemberPhoneNumber p
+    ON p.MemberID = um.MemberID
+   AND p.IsPrimary = 1;"""
     elif selection == "Report8":
          query = """SELECT
     um.FirstName || ' ' || um.LastName AS StudentName,
@@ -100,8 +101,8 @@ JOIN AcademicProgram ap
 FROM Enrollment e
 JOIN Student s
     ON e.StudentID = s.StudentID
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 JOIN Section sec
     ON e.SectionID = sec.SectionID
 JOIN Course c
@@ -111,30 +112,28 @@ JOIN Term t
 ORDER BY t.TermID, c.CourseID, StudentName;"""
     elif selection == "Report9":
         query = """SELECT
-    s.StudentID,
     stu_um.FirstName || ' ' || stu_um.LastName AS StudentName,
-    aa.AdvisorID,
     adv_um.FirstName || ' ' || adv_um.LastName AS AdvisorName
 FROM Student s
-JOIN UniversityManager stu_um
-    ON s.MemberID = stu_um.MemberID
+JOIN UniversityMember stu_um
+    ON s.StudentID = stu_um.MemberID
 LEFT JOIN AdvisorAssignment aa
     ON aa.StudentID = s.StudentID
    AND aa.AssignedEndDate IS NULL
 LEFT JOIN Advisor adv
     ON aa.AdvisorID = adv.AdvisorID
-LEFT JOIN UniversityManager adv_um
-    ON adv.MemberID = adv_um.MemberID
-ORDER BY StudentName;"""
+LEFT JOIN UniversityMember adv_um
+    ON adv.AdvisorID = adv_um.MemberID
+ORDER BY StudentName;
+"""
     elif selection == "Report10":
         query = """SELECT
-    s.StudentID,
     um.FirstName || ' ' || um.LastName AS StudentName,
     e.SectionID,
     e.FinalGrade
-FROM Student s, Enrollment e, UniversityManager um
+FROM Student s, Enrollment e, UniversityMember um
 WHERE s.StudentID = e.StudentID
-  AND s.MemberID  = um.MemberID;"""
+  AND s.StudentID = um.MemberID;"""
     elif selection == "Report11":
         query = """SELECT
     c.CourseID,
@@ -144,7 +143,8 @@ WHERE s.StudentID = e.StudentID
 FROM Course c
 LEFT JOIN Course p
     ON c.PrereqID = p.CourseID
-ORDER BY c.CourseID;"""
+ORDER BY c.CourseID;
+"""
     elif selection == "Report12":
         query = """SELECT
     s.StudentID,
@@ -152,33 +152,33 @@ ORDER BY c.CourseID;"""
     s.MajorProgramCode,
     s.CumulativeGPA
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 WHERE s.CumulativeGPA >
       (
         SELECT AVG(s2.CumulativeGPA)
         FROM Student s2
         WHERE s2.MajorProgramCode = s.MajorProgramCode
       )
-ORDER BY s.MajorProgramCode, s.CumulativeGPA DESC;"""
+ORDER BY s.MajorProgramCode, s.CumulativeGPA DESC;
+"""
     elif selection == "Report13":
         query = """SELECT
-    s.StudentID,
     um.FirstName || ' ' || um.LastName AS StudentName,
     s.CumulativeGPA
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 WHERE s.CumulativeGPA >
       (SELECT AVG(CumulativeGPA) FROM Student)
-ORDER BY s.CumulativeGPA DESC;"""
+ORDER BY s.CumulativeGPA DESC;
+"""
     elif selection == "Report14":
         query = """SELECT
-    s.StudentID,
     um.FirstName || ' ' || um.LastName AS StudentName
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 WHERE EXISTS (
     SELECT 1
     FROM StudentHold sh
@@ -195,25 +195,24 @@ WHERE NOT EXISTS (
     FROM Section sec
     WHERE sec.CourseID = c.CourseID
       AND sec.TermID  = 2
-);"""
+);
+"""
     elif selection == "Report16":
         query = """SELECT
-    um.MemberID,
     um.FirstName || ' ' || um.LastName AS PersonName,
     'Student'                           AS Role
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 
 UNION
 
 SELECT
-    um.MemberID,
     um.FirstName || ' ' || um.LastName AS PersonName,
     'Advisor'                           AS Role
 FROM Advisor a
-JOIN UniversityManager um
-    ON a.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON a.AdvisorID = um.MemberID
 ORDER BY PersonName;"""
     elif selection == "Report17":
         query = """SELECT
@@ -222,18 +221,19 @@ ORDER BY PersonName;"""
     s.AcademicStanding,
     s.TotalCredits
 FROM Student s
-JOIN UniversityManager um
-    ON s.MemberID = um.MemberID
+JOIN UniversityMember um
+    ON s.StudentID = um.MemberID
 WHERE s.AcademicStanding = 'Disqualified'
    OR (s.AcademicStanding = 'Probation' AND s.TotalCredits > 60)
 ORDER BY s.AcademicStanding, s.TotalCredits DESC;
+
 """
     elif selection == "Report18":
         query = """SELECT
     sec.SectionID,
     c.CourseID,
-    c.Title AS CourseTitle,
-    COUNT(e.StudentID) AS EnrolledCount
+    c.Title              AS CourseTitle,
+    COUNT(e.StudentID)   AS EnrolledCount
 FROM Section sec
 JOIN Course c
     ON sec.CourseID = c.CourseID
@@ -254,7 +254,8 @@ JOIN Course c
     ON sec.CourseID = c.CourseID
 WHERE sec.MeetingDateStart <= '2025-12-31'
   AND sec.MeetingDateEnd   >= '2025-01-01'
-ORDER BY sec.MeetingDateStart;"""
+ORDER BY sec.MeetingDateStart;
+"""
     elif selection == "Report20":
         query = """SELECT
     sec.SectionID,
@@ -267,7 +268,8 @@ JOIN Section sec
     ON sgi.SectionID = sec.SectionID
 JOIN Course c
     ON sec.CourseID = c.CourseID
-ORDER BY sec.SectionID, sgi.ItemNo;"""
+ORDER BY sec.SectionID, sgi.ItemNo;
+"""
     else:
         return "Invalid selection"
 
@@ -284,4 +286,3 @@ ORDER BY sec.SectionID, sgi.ItemNo;"""
 
 if __name__ == "__main__":
     app.run(debug=True)
-
